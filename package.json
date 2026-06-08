@@ -1,0 +1,28 @@
+{
+  "name": "redmine-cli",
+  "version": "0.1.0",
+  "description": "A Redmine CLI.",
+  "type": "module",
+  "bin": {
+    "redmine": "dist/index.js"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "engines": {
+    "bun": ">=1.0.0"
+  },
+  "scripts": {
+    "dev": "bun --watch run index.ts",
+    "build": "bun build ./index.ts --outdir dist --target bun",
+    "tsc": "tsc --noEmit",
+    "prepublishOnly": "bun run build"
+  },
+  "devDependencies": {
+    "@types/bun": "latest",
+    "@types/node": "^22.15.21",
+    "typescript": "^5.8.3"
+  }
+}
