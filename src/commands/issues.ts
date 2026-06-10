@@ -568,27 +568,22 @@ function issueListResponseToMarkdown(response: IssueListResponse, filters: Issue
       continue;
     }
 
-    const id = scalarValue(issue.id) ?? "?";
-    const subject = scalarValue(issue.subject) ?? "Untitled issue";
-    const sprint = getIssueSprintValue(issue);
+    const summary = summarizeIssue(issue);
+    const id = scalarValue(summary.id) ?? "?";
+    const subject = scalarValue(summary.subject) ?? "Untitled issue";
     const fields = markdownTable([
-      ["Project", scalarValue(issue.project)],
-      ["Tracker", scalarValue(issue.tracker)],
-      ["Status", scalarValue(issue.status)],
-      ["Priority", scalarValue(issue.priority)],
-      ["Assignee", scalarValue(issue.assigned_to)],
-      ["Author", scalarValue(issue.author)],
-      ["Sprint", sprint],
-      ["Done", scalarValue(issue.done_ratio) ? `${scalarValue(issue.done_ratio)}%` : undefined],
-      ["Estimated", formatHours(issue.estimated_hours)],
-      ["Spent", formatHours(issue.spent_hours)],
-      ["Total spent", formatHours(issue.total_spent_hours)],
-      ["Start", scalarValue(issue.start_date)],
-      ["Due", scalarValue(issue.due_date)],
-      ["Created", formatDateTime(issue.created_on)],
-      ["Updated", formatDateTime(issue.updated_on)],
-      ["Closed", formatDateTime(issue.closed_on)],
-      ["Private", issue.is_private === true ? "yes" : undefined],
+      ["Project", summary.project],
+      ["Tracker", summary.tracker],
+      ["Status", summary.status],
+      ["Priority", summary.priority],
+      ["Assignee", summary.assignee],
+      ["Author", summary.author],
+      ["Sprint", summary.sprint],
+      ["Done", scalarValue(summary.done_ratio) ? `${scalarValue(summary.done_ratio)}%` : undefined],
+      ["Estimated", formatHours(summary.estimated_hours)],
+      ["Spent", formatHours(summary.spent_hours)],
+      ["Created", formatDateTime(summary.created_on)],
+      ["Updated", formatDateTime(summary.updated_on)],
     ]);
 
     parts.push(`## #${mdEscape(id)} ${mdEscape(subject)}`);
@@ -596,14 +591,8 @@ function issueListResponseToMarkdown(response: IssueListResponse, filters: Issue
       parts.push(fields);
     }
 
-    const description = normalizeRedmineTextileToMarkdown(issue.description);
-    if (description) {
-      parts.push("### Description", description);
-    }
-
-    const customFields = customFieldsMarkdown(issue);
-    if (customFields) {
-      parts.push("### Custom fields", customFields);
+    if (summary.description_preview) {
+      parts.push("### Description preview", mdEscape(summary.description_preview));
     }
   }
 
