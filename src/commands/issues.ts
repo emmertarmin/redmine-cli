@@ -309,7 +309,7 @@ function normalizeRedmineTextileToMarkdown(value: unknown): string | undefined {
     .replace(/&amp;/g, "&")
     .replace(/^h([1-6])\.\s+/gm, (_, level: string) => `${"#".repeat(Number.parseInt(level, 10))} `)
     .replace(/^bq\.\s+/gm, "> ")
-    .replace(/^p[<>=(){}\[\]#.\w-]*\.\s+/gm, "")
+    .replace(/^p[<>=(){}[\]#.\w-]*\.\s+/gm, "")
     .replace(/(^|[\s([{])\*([^*\n]+)\*(?=[\s).,!?:;\]}]|$)/g, "$1**$2**")
     .replace(/\+([^+\n]+)\+/g, "$1")
     .replace(/"([^"\n]+)":(https?:\/\/\S+)/g, "[$1]($2)")
