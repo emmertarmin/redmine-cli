@@ -1120,6 +1120,7 @@ const issueListFlags = [
 
 export const issueGetCommand: CommandDefinition = {
   name: "get",
+  requiresConfig: true,
   aliases: ["show"],
   summary: "Get an issue",
   description: "Get a single Redmine issue as JSON. Journals, attachments, relations, changesets, and watchers are included by default.",
@@ -1193,6 +1194,7 @@ export const issueGetCommand: CommandDefinition = {
 
 export const issueListCommand: CommandDefinition = {
   name: "list",
+  requiresConfig: true,
   summary: "List issues",
   description: "List Redmine issues. Results are filtered to semantically open issues by default.",
   flags: issueListFlags,
@@ -1216,6 +1218,7 @@ export const issueListCommand: CommandDefinition = {
 
 export const issueMineCommand: CommandDefinition = {
   name: "mine",
+  requiresConfig: true,
   summary: "List my open issues",
   description: "List issues assigned to the configured Redmine user. Results are filtered to semantically open issues by default.",
   flags: issueListFlags.filter((flag) => flag.name !== "assignee"),
@@ -1231,6 +1234,7 @@ export const issueMineCommand: CommandDefinition = {
 
 export const issueAssignedCommand: CommandDefinition = {
   name: "assigned",
+  requiresConfig: true,
   summary: "List issues assigned to a user",
   description: "List issues assigned to a Redmine user ID, or to 'me'. Results are filtered to semantically open issues by default.",
   arguments: [

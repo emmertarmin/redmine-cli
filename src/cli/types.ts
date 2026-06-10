@@ -35,5 +35,6 @@ export type CommandDefinition = {
   examples?: string[];
   subcommands?: CommandDefinition[];
   hidden?: boolean;
+  requiresConfig?: boolean;
   execute?: (context: CommandContext) => Promise<void>;
 };

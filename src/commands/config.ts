@@ -1,5 +1,7 @@
+import { stdin as input, stderr as output } from "node:process";
+import { createInterface } from "node:readline/promises";
 import type { CommandDefinition } from "../cli/types.js";
-import { getIssueMirrorDir, loadConfig, saveConfig } from "../config/load-config.js";
+import { formatMissingConfigWarning, getIssueMirrorDir, getMissingRequiredConfig, loadConfig, saveConfig } from "../config/load-config.js";
 import { getConfigPath } from "../config/xdg.js";
 import type { AppConfig } from "../config/types.js";
 
@@ -90,6 +92,75 @@ export const configListCommand: CommandDefinition = {
   },
 };
 
+type PromptReader = {
+  question: (message: string) => Promise<string>;
+  close: () => void;
+};
+
+async function createPromptReader(): Promise<PromptReader> {
+  if (input.isTTY) {
+    return createInterface({ input, output });
+  }
+
+  const chunks: Buffer[] = [];
+  for await (const chunk of input) {
+    chunks.push(typeof chunk === "string" ? Buffer.from(chunk) : chunk);
+  }
+  const answers = Buffer.concat(chunks).toString("utf8").split(/\r?\n/);
+  let index = 0;
+  return {
+    question: async (message: string) => {
+      output.write(message);
+      return answers[index++] ?? "";
+    },
+    close: () => {},
+  };
+}
+
+async function prompt(readline: PromptReader, message: string, currentValue?: string, options: { mask?: (value: string) => string } = {}): Promise<string | undefined> {
+  const suffix = currentValue ? ` [current: ${options.mask ? options.mask(currentValue) : currentValue}]` : "";
+  const answer = await readline.question(`${message}${suffix}: `);
+  const value = answer.trim();
+  return value === "" ? currentValue : value;
+}
+
+export const configSetupCommand: CommandDefinition = {
+  name: "setup",
+  aliases: ["init"],
+  summary: "Interactively set up Redmine configuration",
+  description: "Prompt for the required Redmine URL and API key, then write them to the XDG config file.",
+  examples: ["redmine config setup"],
+  execute: async ({ positionals }) => {
+    if (positionals.length > 0) {
+      throw new Error(`Unexpected argument: ${positionals[0]}`);
+    }
+
+    const currentConfig = await loadConfig();
+    const readline = await createPromptReader();
+    try {
+      output.write(`Redmine configuration setup (${getConfigPath()})\n`);
+      const url = await prompt(readline, "Redmine URL", currentConfig.url);
+      const key = await prompt(readline, "Redmine API key", currentConfig.key, { mask: maskApiKey });
+
+      const nextConfig: AppConfig = {
+        ...currentConfig,
+        ...(url ? { url } : {}),
+        ...(key ? { key } : {}),
+      };
+
+      const missing = getMissingRequiredConfig(nextConfig);
+      if (missing.length > 0) {
+        throw new Error(formatMissingConfigWarning(missing));
+      }
+
+      await saveConfig(nextConfig);
+      console.log(`Wrote ${getConfigPath()}`);
+    } finally {
+      readline.close();
+    }
+  },
+};
+
 export const configSetCommand: CommandDefinition = {
   name: "set",
   summary: "Set Redmine configuration",
@@ -148,5 +219,5 @@ export const configCommand: CommandDefinition = {
   name: "config",
   summary: "Manage configuration",
   description: "Commands for Redmine settings stored in the XDG config file.",
-  subcommands: [configGetCommand, configSetCommand, configListCommand],
+  subcommands: [configGetCommand, configSetCommand, configSetupCommand, configListCommand],
 };

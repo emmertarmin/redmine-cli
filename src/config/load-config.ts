@@ -8,6 +8,19 @@ export async function ensureConfigDir() {
   await mkdir(dirname(getConfigPath()), { recursive: true });
 }
 
+export const requiredConfigKeys = ["url", "key"] as const;
+
+export type RequiredConfigKey = (typeof requiredConfigKeys)[number];
+
+export function getMissingRequiredConfig(config: AppConfig): RequiredConfigKey[] {
+  return requiredConfigKeys.filter((key) => !config[key]);
+}
+
+export function formatMissingConfigWarning(missing: RequiredConfigKey[]): string {
+  const names = missing.map((key) => `--${key}`).join(", ");
+  return `Missing required Redmine configuration: ${names}. Run \`redmine config setup\`.`;
+}
+
 export async function loadConfig(): Promise<AppConfig> {
   const configPath = getConfigPath();
 
@@ -35,6 +48,15 @@ export async function loadConfig(): Promise<AppConfig> {
 
 export function getIssueMirrorDir(config: AppConfig): string {
   return config.issueMirrorDir ? expandHomePath(config.issueMirrorDir) : getDefaultIssueMirrorDir();
+}
+
+export async function loadRequiredConfig(): Promise<AppConfig> {
+  const config = await loadConfig();
+  const missing = getMissingRequiredConfig(config);
+  if (missing.length > 0) {
+    throw new Error(formatMissingConfigWarning(missing));
+  }
+  return config;
 }
 
 export async function saveConfig(config: AppConfig) {

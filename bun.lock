@@ -3,7 +3,7 @@
   "configVersion": 1,
   "workspaces": {
     "": {
-      "name": "redmine-cli",
+      "name": "@emmertarmin/redmine-cli",
       "devDependencies": {
         "@types/bun": "latest",
         "@types/node": "^22.15.21",

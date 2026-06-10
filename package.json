@@ -1,7 +1,15 @@
 {
-  "name": "redmine-cli",
+  "name": "@emmertarmin/redmine-cli",
   "version": "0.1.0",
-  "description": "A Redmine CLI.",
+  "description": "A personal Redmine CLI.",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/emmertarmin/redmine-cli.git"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
   "type": "module",
   "bin": {
     "redmine": "dist/index.js"

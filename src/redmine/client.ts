@@ -9,7 +9,7 @@ export type RedmineRequestOptions = {
 
 function requireString(value: string | undefined, name: string): string {
   if (!value) {
-    throw new Error(`Missing Redmine ${name}. Run \`redmine config set --${name} <value>\`.`);
+    throw new Error(`Missing Redmine ${name}. Run \`redmine config setup\` or \`redmine config set --${name} <value>\`.`);
   }
   return value;
 }

@@ -1,6 +1,6 @@
 import { printCommandHelp, printRootHelp } from "./cli/help.js";
 import { parseCli } from "./cli/parse.js";
-import { ensureConfigDir } from "./config/load-config.js";
+import { ensureConfigDir, formatMissingConfigWarning, getMissingRequiredConfig, loadConfig } from "./config/load-config.js";
 import { printVersion } from "./version.js";
 
 async function main() {
@@ -27,6 +27,14 @@ async function main() {
   if (wantsHelp || typeof parsed.command.execute !== "function") {
     printCommandHelp(parsed.command, parsed.path);
     return;
+  }
+
+  if (parsed.command.requiresConfig === true) {
+    const missing = getMissingRequiredConfig(await loadConfig());
+    if (missing.length > 0) {
+      console.error(`Warning: ${formatMissingConfigWarning(missing)}`);
+      process.exit(1);
+    }
   }
 
   await parsed.command.execute({
