@@ -40,9 +40,26 @@ Options:
 Subcommands:
   config - Manage configuration
   issue - Work with issues
+  activity - Watch Redmine activity
 
 Run `redmine <command> --help` for command-specific help.
 ```
+
+### Watch activity
+
+```bash
+redmine activity
+redmine activity -n 60
+redmine activity -o jsonl
+redmine activity watch
+redmine activity watch -n 5
+redmine activity watch -o jsonl
+redmine activity watch --verbose
+```
+
+`activity` prints recent issue updates and time entries once. Use `-n` / `--minutes` to choose the lookback window, defaulting to 15 minutes.
+
+`activity watch` polls recent activity, prints recent activity on startup, then continues printing new events. Minimal human-readable text is the default output. Use `--verbose` / `-v` for full markdown details. With `-o jsonl`, default output is `{ "text": "..." }`; verbose JSONL emits the full event object.
 
 ## License
 

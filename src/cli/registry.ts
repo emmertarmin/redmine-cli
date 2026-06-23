@@ -1,3 +1,4 @@
+import { activityCommand } from "../commands/activity.js";
 import { configCommand } from "../commands/config.js";
 import { issueCommand } from "../commands/issues.js";
 import type { CommandDefinition, FlagDefinition } from "./types.js";
@@ -21,7 +22,7 @@ export const rootCommand: CommandDefinition = {
   name: "redmine",
   summary: "Redmine CLI",
   description: "Inspect and manage Redmine resources from the command line.",
-  subcommands: [configCommand, issueCommand],
+  subcommands: [configCommand, issueCommand, activityCommand],
 };
 
 export function getVisibleSubcommands(command: CommandDefinition): CommandDefinition[] {
@@ -67,5 +68,12 @@ export function resolveCommandPath(args: string[]) {
 }
 
 export function collectCommandFlags(command: CommandDefinition | undefined): FlagDefinition[] {
-  return [...globalFlags, ...(command?.flags ?? [])];
+  const commandFlags = command?.flags ?? [];
+  const commandAliases = new Set(commandFlags.flatMap((flag) => flag.aliases ?? []));
+  const globals = globalFlags.map((flag) => ({
+    ...flag,
+    aliases: flag.aliases?.filter((alias) => !commandAliases.has(alias)),
+  }));
+
+  return [...globals, ...commandFlags];
 }
