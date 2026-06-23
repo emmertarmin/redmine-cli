@@ -1112,7 +1112,7 @@ export const issueGetCommand: CommandDefinition = {
   requiresConfig: true,
   aliases: ["show"],
   summary: "Get an issue",
-  description: "Get a single Redmine issue as JSON. Journals, attachments, relations, changesets, and watchers are included by default.",
+  description: "Get a single Redmine issue as Markdown. Journals, attachments, relations, changesets, and watchers are included by default.",
   arguments: [
     {
       name: "id",
@@ -1139,7 +1139,7 @@ export const issueGetCommand: CommandDefinition = {
       type: "string" as const,
       choices: ["json", "md"],
       description: "Output format: json or md",
-      defaultValue: "json",
+      defaultValue: "md",
     },
     {
       name: "no-secondary",
@@ -1147,7 +1147,7 @@ export const issueGetCommand: CommandDefinition = {
       description: "Skip secondary requests for time entries and lookup metadata",
     },
   ],
-  examples: ["redmine issue get 43135", "redmine issue get 43135 -o md", "redmine issue get 43135 --include journals,attachments,relations", "redmine issue get 43135 --include none", "redmine issue get 43135 --raw"],
+  examples: ["redmine issue get 43135", "redmine issue get 43135 -o json", "redmine issue get 43135 --include journals,attachments,relations", "redmine issue get 43135 --include none", "redmine issue get 43135 --raw"],
   execute: async ({ values, positionals }) => {
     if (positionals.length !== 1) {
       throw new Error("Expected exactly one issue ID argument");
