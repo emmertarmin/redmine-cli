@@ -1,6 +1,6 @@
 {
   "name": "@emmertarmin/redmine-cli",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "A personal Redmine CLI.",
   "license": "MIT",
   "repository": {
